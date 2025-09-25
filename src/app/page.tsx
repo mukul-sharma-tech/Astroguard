@@ -1,103 +1,301 @@
-import Image from "next/image";
+// import ControlPanel from './components/ControlPanel';
+// import SceneContainer from './components/SceneContainer';
+// import ResultsPanel from './components/ResultsPanel';
+
+// export interface Asteroid {
+//   id: string;
+//   name: string;
+// }
+
+// export default function Home() {
+//   return (
+//     <main className="bg-gray-900 min-h-screen text-white p-4 sm:p-6 lg:p-8">
+//       <header className="text-center mb-8">
+//         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+//           AstroGuard: Earth&apos;s Sentinel
+//         </h1>
+//         <p className="mt-2 text-lg text-gray-400">
+//           Interactive Asteroid Impact Simulation
+//         </p>
+//       </header>
+
+//       {/* Main Grid Layout */}
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+//         {/* Left Column: Controls */}
+//         <div className="lg:col-span-1">
+//           <ControlPanel />
+//         </div>
+
+//         {/* Center Column: Visualization */}
+//         <div className="lg:col-span-1">
+//           <SceneContainer />
+//         </div>
+
+//         {/* Right Column: Results */}
+//         <div className="lg:col-span-1">
+//           <ResultsPanel />
+//         </div>
+//       </div>
+//     </main>
+//   );
+// }
+
+// export type Trajectory = [number, number, number][];
+
+// 'use client';
+
+// import { useState, useEffect } from 'react';
+// import ControlPanel from './components/ControlPanel';
+// import SceneContainer from './components/SceneContainer';
+// import ResultsPanel from './components/ResultsPanel';
+
+// export interface Asteroid {
+//   id: string;
+//   name: string;
+// }
+
+// export type Trajectory = [number, number, number][];
+
+// export default function Home() {
+//   const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
+//   const [selectedAsteroid, setSelectedAsteroid] = useState<Asteroid | null>(null);
+//   const [trajectory, setTrajectory] = useState<Trajectory | null>(null);
+//   const [isLoading, setIsLoading] = useState({ asteroids: true, trajectory: false });
+//   const [error, setError] = useState<{ asteroids: string | null, trajectory: string | null }>({ asteroids: null, trajectory: null });
+
+//   // Fetch the list of asteroids on initial load
+//   useEffect(() => {
+//     async function fetchAsteroids() {
+//       try {
+//         const response = await fetch('/api/asteroids');
+//         if (!response.ok) throw new Error('Failed to fetch asteroids.');
+//         const data: Asteroid[] = await response.json();
+//         setAsteroids(data);
+//       } catch (err) {
+//         setError(prev => ({ ...prev, asteroids: err instanceof Error ? err.message : 'Unknown error' }));
+//       } finally {
+//         setIsLoading(prev => ({ ...prev, asteroids: false }));
+//       }
+//     }
+//     fetchAsteroids();
+//   }, []);
+
+//   // Fetch trajectory when a new asteroid is selected
+//   useEffect(() => {
+//     if (!selectedAsteroid) {
+//       setTrajectory(null);
+//       return;
+//     }
+
+//     async function fetchTrajectory() {
+//       setIsLoading(prev => ({ ...prev, trajectory: true }));
+//       setError(prev => ({ ...prev, trajectory: null }));
+//       setTrajectory(null);
+//       try {
+//         const response = await fetch(`/api/asteroid-details?sstr=${encodeURIComponent(selectedAsteroid.name)}`);
+//         if (!response.ok) throw new Error(`Failed to fetch trajectory for ${selectedAsteroid.name}.`);
+//         const data = await response.json();
+//         setTrajectory(data.trajectory);
+//       } catch (err) {
+//         setError(prev => ({ ...prev, trajectory: err instanceof Error ? err.message : 'Unknown error' }));
+//       } finally {
+//         setIsLoading(prev => ({ ...prev, trajectory: false }));
+//       }
+//     }
+//     fetchTrajectory();
+//   }, [selectedAsteroid]);
+
+//   const handleAsteroidSelect = (asteroidId: string) => {
+//     const selected = asteroids.find(a => a.id === asteroidId) || null;
+//     setSelectedAsteroid(selected);
+//   };
+
+//   return (
+//     <main className="bg-gray-900 min-h-screen text-white p-4 sm:p-6 lg:p-8">
+//       <header className="text-center mb-8">
+//         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+//           AstroGuard: Earth's Sentinel
+//         </h1>
+//         <p className="mt-2 text-lg text-gray-400">
+//           Interactive Asteroid Impact Simulation
+//         </p>
+//       </header>
+
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+//         <div className="lg:col-span-1">
+//           <ControlPanel
+//             asteroids={asteroids}
+//             onAsteroidSelect={handleAsteroidSelect}
+//             isLoading={isLoading.asteroids}
+//             error={error.asteroids}
+//           />
+//         </div>
+
+//         <div className="lg:col-span-1">
+//           <SceneContainer 
+//             trajectory={trajectory}
+//             isLoading={isLoading.trajectory}
+//           />
+//         </div>
+
+//         <div className="lg:col-span-1">
+//           <ResultsPanel />
+//         </div>
+//       </div>
+//     </main>
+//   );
+// }
+
+
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import ControlPanel from './components/ControlPanel';
+import SceneContainer from './components/SceneContainer';
+import ResultsPanel from './components/ResultsPanel';
+
+export interface Asteroid {
+  id: string;
+  name: string;
+  // Adding estimated diameter and velocity for simulation
+  estimated_diameter_m: number;
+  relative_velocity_kms: number;
+}
+
+export type Trajectory = [number, number, number][];
+
+export interface SimulationResults {
+  impactEnergyMT: number;
+  craterDiameterKM: number;
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
+  const [selectedAsteroid, setSelectedAsteroid] = useState<Asteroid | null>(null);
+  const [trajectory, setTrajectory] = useState<Trajectory | null>(null);
+  const [simulationResults, setSimulationResults] = useState<SimulationResults | null>(null);
+  
+  const [isLoading, setIsLoading] = useState({ asteroids: true, trajectory: false, simulation: false });
+  const [error, setError] = useState<{ asteroids: string | null, trajectory: string | null, simulation: string | null }>({ asteroids: null, trajectory: null, simulation: null });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Fetch the list of asteroids on initial load
+  useEffect(() => {
+    async function fetchAsteroids() {
+      try {
+        const response = await fetch('/api/asteroids');
+        if (!response.ok) throw new Error('Failed to fetch asteroids.');
+        const data: Asteroid[] = await response.json();
+        setAsteroids(data);
+      } catch (err) {
+        setError(prev => ({ ...prev, asteroids: err instanceof Error ? err.message : 'Unknown error' }));
+      } finally {
+        setIsLoading(prev => ({ ...prev, asteroids: false }));
+      }
+    }
+    fetchAsteroids();
+  }, []);
+
+  // Fetch trajectory when a new asteroid is selected
+  useEffect(() => {
+    if (!selectedAsteroid) {
+      setTrajectory(null);
+      setSimulationResults(null); // Clear previous results
+      return;
+    }
+
+    async function fetchTrajectory() {
+      setIsLoading(prev => ({ ...prev, trajectory: true }));
+      setError(prev => ({ ...prev, trajectory: null }));
+      setTrajectory(null);
+      try {
+        const response = await fetch(`/api/asteroid-details?sstr=${encodeURIComponent(selectedAsteroid.name)}`);
+        if (!response.ok) throw new Error(`Failed to fetch trajectory for ${selectedAsteroid.name}.`);
+        const data = await response.json();
+        setTrajectory(data.trajectory);
+      } catch (err) {
+        setError(prev => ({ ...prev, trajectory: err instanceof Error ? err.message : 'Unknown error' }));
+      } finally {
+        setIsLoading(prev => ({ ...prev, trajectory: false }));
+      }
+    }
+    fetchTrajectory();
+  }, [selectedAsteroid]);
+
+  const handleAsteroidSelect = (asteroidId: string) => {
+    const selected = asteroids.find(a => a.id === asteroidId) || null;
+    setSelectedAsteroid(selected);
+  };
+
+  const handleSimulate = async () => {
+    if (!selectedAsteroid) return;
+
+    setIsLoading(prev => ({ ...prev, simulation: true }));
+    setError(prev => ({ ...prev, simulation: null }));
+    setSimulationResults(null);
+
+    try {
+      const response = await fetch('/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          diameter: selectedAsteroid.estimated_diameter_m,
+          velocity: selectedAsteroid.relative_velocity_kms
+        })
+      });
+
+      if (!response.ok) throw new Error('Simulation failed.');
+      
+      const results: SimulationResults = await response.json();
+      setSimulationResults(results);
+
+    } catch (err) {
+      setError(prev => ({ ...prev, simulation: err instanceof Error ? err.message : 'Unknown error' }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, simulation: false }));
+    }
+  };
+
+  return (
+    <main className="bg-gray-900 min-h-screen text-white p-4 sm:p-6 lg:p-8">
+      <header className="text-center mb-8">
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+          AstroGuard: Earth's Sentinel
+        </h1>
+        <p className="mt-2 text-lg text-gray-400">
+          Interactive Asteroid Impact Simulation
+        </p>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <div className="lg:col-span-1">
+          <ControlPanel
+            asteroids={asteroids}
+            selectedAsteroid={selectedAsteroid}
+            onAsteroidSelect={handleAsteroidSelect}
+            onSimulate={handleSimulate}
+            isLoading={isLoading.asteroids}
+            isSimulating={isLoading.simulation}
+            error={error.asteroids}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="lg:col-span-1">
+          <SceneContainer 
+            trajectory={trajectory}
+            isLoading={isLoading.trajectory}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+
+        <div className="lg:col-span-1">
+          <ResultsPanel 
+            results={simulationResults}
+            isLoading={isLoading.simulation}
+            error={error.simulation}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </div>
+      </div>
+    </main>
   );
 }
+
