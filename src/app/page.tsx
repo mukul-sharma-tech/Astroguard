@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Scene, PerspectiveCamera, WebGLRenderer, TextureLoader, CircleGeometry, MeshBasicMaterial, Mesh, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points } from 'three';
-import { ChevronRight, X, Users, Home, Instagram, Linkedin, Mail, Calendar, Lightbulb, Info, Rocket, Filter, Brain, Globe, Smartphone, Code, ExternalLink, Github, Eye, Target, MapPin, Briefcase } from 'lucide-react';
+// Added next/image for optimized images
+import Image from 'next/image'; 
+import { Scene, PerspectiveCamera, WebGLRenderer, TextureLoader, CircleGeometry, MeshBasicMaterial, Mesh, BufferGeometry, Float32BufferAttribute, PointsMaterial, Points, Clock } from 'three';
+// FIX 1: Removed 'Briefcase' and 'MapPin' as they were unused.
+import { ChevronRight, X, Users, Home, Instagram, Linkedin, Mail, Calendar, Lightbulb, Info, Rocket, Filter, Brain, Globe, Smartphone, Code, ExternalLink, Github, Eye, Target } from 'lucide-react';
+
 //================================================================//
 //  0. DATA
 //================================================================//
 const projectsData = [
-  { id: 1, title: 'AI-Powered Learning Assistant', description: 'An interactive AI assistant to help students with their studies, providing real-time answers and resources.', image: null, category: 'AI', technologies: ['Python', 'TensorFlow', 'NLP', 'React'], liveUrl: '#', githubUrl: '#', status: 'In Development' },
-  { id: 2, title: 'Society Alumni Portal', description: 'A web platform to connect current society members with alumni for mentorship and networking.', image: null, category: 'Web', technologies: ['Next.js', 'Firebase', 'Tailwind CSS', 'Node.js'], liveUrl: '#', githubUrl: '#', status: 'Completed' },
-  { id: 3, title: 'Campus Event Navigator', description: 'A mobile app to help students find and navigate to events happening on campus.', image: null, category: 'Mobile', technologies: ['React Native', 'Expo', 'Google Maps API'], liveUrl: '#', githubUrl: '#', status: 'Planning' },
+  // Using a real image URL for demonstration purposes
+  { id: 1, title: 'AI-Powered Learning Assistant', description: 'An interactive AI assistant to help students with their studies, providing real-time answers and resources.', image: '/images/project-ai.jpg', category: 'AI', technologies: ['Python', 'TensorFlow', 'NLP', 'React'], liveUrl: '#', githubUrl: '#', status: 'In Development' },
+  { id: 2, title: 'Society Alumni Portal', description: 'A web platform to connect current society members with alumni for mentorship and networking.', image: '/images/project-web.jpg', category: 'Web', technologies: ['Next.js', 'Firebase', 'Tailwind CSS', 'Node.js'], liveUrl: '#', githubUrl: '#', status: 'Completed' },
+  { id: 3, title: 'Campus Event Navigator', description: 'A mobile app to help students find and navigate to events happening on campus.', image: '/images/project-mobile.jpg', category: 'Mobile', technologies: ['React Native', 'Expo', 'Google Maps API'], liveUrl: '#', githubUrl: '#', status: 'Planning' },
   { id: 4, title: 'Code-Collab Platform', description: 'A real-time collaborative coding platform for hackathons and team projects.', image: null, category: 'Web', technologies: ['React', 'WebSockets', 'Docker', 'MongoDB'], liveUrl: '#', githubUrl: '#', status: 'Completed' },
 ];
 
@@ -36,12 +41,14 @@ const journeyData = [
 //================================================================//
 
 const Loader = () => {
-  const mountRef = useRef(null);
+  // FIX 2: Typed the ref to let TypeScript know it's a div element.
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const currentMount = mountRef.current;
     if (!currentMount) return;
     const scene = new Scene();
+    // This resolves the `currentMount.clientWidth` type error.
     const camera = new PerspectiveCamera(75, currentMount.clientWidth / currentMount.clientHeight, 0.1, 1000);
     camera.position.z = 5;
     const renderer = new WebGLRenderer({ antialias: true, alpha: true });
@@ -49,7 +56,8 @@ const Loader = () => {
     renderer.setPixelRatio(window.devicePixelRatio);
     currentMount.appendChild(renderer.domElement);
     const textureLoader = new TextureLoader();
-    const logoTexture = textureLoader.load('logo.jpeg');
+    // Make sure 'logo.jpeg' is in your /public directory
+    const logoTexture = textureLoader.load('/logo.jpeg');
     const logoGeometry = new CircleGeometry(1.5, 64);
     const logoMaterial = new MeshBasicMaterial({ map: logoTexture });
     const logoMesh = new Mesh(logoGeometry, logoMaterial);
@@ -57,9 +65,12 @@ const Loader = () => {
     const animate = () => { requestAnimationFrame(animate); renderer.render(scene, camera); };
     animate();
     const handleResize = () => {
-      camera.aspect = currentMount.clientWidth / currentMount.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
+      // Added a check for currentMount to be safe
+      if (currentMount) {
+        camera.aspect = currentMount.clientWidth / currentMount.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
+      }
     };
     window.addEventListener('resize', handleResize);
     const speakWelcomeMessage = () => { if ('speechSynthesis' in window) { const utterance = new SpeechSynthesisUtterance("Welcome to the world of TechXtract"); utterance.rate = 0.9; utterance.pitch = 1.1; window.speechSynthesis.speak(utterance); } };
@@ -84,7 +95,8 @@ const Loader = () => {
 };
 
 const AnimatedBackground = () => {
-  const mountRef = useRef(null);
+  // FIX 2 (cont.): Typed this ref as well.
+  const mountRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const currentMount = mountRef.current;
     if (!currentMount) return;
@@ -107,10 +119,18 @@ const AnimatedBackground = () => {
     const stars = new Points(starGeometry, starMaterial);
     scene.add(stars);
     let mouseX = 0; let mouseY = 0;
-    const onMouseMove = (event) => { mouseX = (event.clientX / window.innerWidth) * 2 - 1; mouseY = -(event.clientY / window.innerHeight) * 2 + 1; };
+    const onMouseMove = (event: MouseEvent) => { mouseX = (event.clientX / window.innerWidth) * 2 - 1; mouseY = -(event.clientY / window.innerHeight) * 2 + 1; };
     document.addEventListener('mousemove', onMouseMove);
-    const clock = { getElapsedTime: () => new Date().getTime() * 0.0001 };
-    const animate = () => { requestAnimationFrame(animate); stars.rotation.y = clock.getElapsedTime() * 0.1; camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02; camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.02; camera.lookAt(scene.position); renderer.render(scene, camera); };
+    // Use Three.js Clock for smoother animation
+    const clock = new Clock();
+    const animate = () => {
+        requestAnimationFrame(animate);
+        stars.rotation.y = clock.getElapsedTime() * 0.1;
+        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02;
+        camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.02;
+        camera.lookAt(scene.position);
+        renderer.render(scene, camera);
+    };
     animate();
     const handleResize = () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
     window.addEventListener('resize', handleResize);
@@ -123,10 +143,11 @@ const AnimatedBackground = () => {
   return <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }} />;
 };
 
-const CircularNav = ({ onNavigate }) => {
+// Added type for props
+const CircularNav = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navItems = [{ id: 'home', label: 'Home', icon: <Home size={24} /> }, { id: 'about', label: 'About', icon: <Info size={24} /> }, { id: 'team', label: 'Team', icon: <Users size={24} /> }, { id: 'projects', label: 'Projects', icon: <Lightbulb size={24} /> }, { id: 'events', label: 'Events', icon: <Calendar size={24} /> }, { id: 'journey', label: 'Journey', icon: <Rocket size={24} /> },{ id: 'contact', label: 'Contact', icon: <Mail size={24} /> }];
-  const handleNavClick = (page) => { setIsOpen(false); setTimeout(() => { onNavigate(page); }, 700); };
+  const handleNavClick = (page: string) => { setIsOpen(false); setTimeout(() => { onNavigate(page); }, 700); };
   const radius = 150;
   return (
     <>
@@ -147,11 +168,22 @@ const CircularNav = ({ onNavigate }) => {
   );
 };
 
-const Button = ({ children, onClick, disabled, variant = 'default', size = 'md', className = '' }) => {
+// Added types for button props
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
+  variant?: 'default' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const Button: React.FC<ButtonProps> = ({ children, onClick, disabled, variant = 'default', size = 'md', className = '', type = 'button' }) => {
   const baseStyle = "inline-flex items-center justify-center rounded-md font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
   const sizeStyles = { sm: "px-3 py-1.5 text-xs", md: "px-4 py-2 text-sm", lg: "px-6 py-3 text-base", };
   const variantStyles = { default: "bg-cyan-500 text-black hover:bg-cyan-400", outline: "border border-cyan-500 bg-transparent hover:bg-cyan-500/10", };
-  return (<button onClick={onClick} disabled={disabled} className={`${baseStyle} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}>{children}</button>);
+  return (<button type={type} onClick={onClick} disabled={disabled} className={`${baseStyle} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}>{children}</button>);
 }
 
 //================================================================//
@@ -184,12 +216,28 @@ const AboutPage = () => {
 };
 
 const TeamPage = () => {
-  const teamMembers = [{ name: 'Aditya Srivastav', role: 'President', img: 'https://placehold.co/400x400/000000/FFFFFF?text=Alex' }, { name: 'Gauri', role: 'Vice President', img: 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Brenda' }, { name: 'Gagandeep Singh', role: 'Social Media Head', img: 'https://placehold.co/400x400/333333/FFFFFF?text=Charlie' }, { name: 'Prateek Agarwal', role: 'Operations Head', img: 'https://placehold.co/400x400/4d4d4d/FFFFFF?text=Diana' }, { name: 'Ishan Mishra', role: 'Graphics Head', img: 'https://placehold.co/400x400/666666/FFFFFF?text=Ethan' }, { name: 'Sarvagya Joshi', role: 'Tech Head', img: 'https://placehold.co/400x400/808080/FFFFFF?text=Fiona' },
-  { name: 'Hitesh Tyagi', role: 'PR Head', img: 'https://placehold.co/400x400/000000/FFFFFF?text=Alex' }, { name: 'Yaniya', role: 'Frontend Lead', img: 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Brenda' }, { name: 'Manan Wadhwa', role: 'AI/ML Head', img: 'https://placehold.co/400x400/333333/FFFFFF?text=Charlie' }, { name: 'Pratham Gupta', role: 'Backend Lead', img: 'https://placehold.co/400x400/4d4d4d/FFFFFF?text=Diana' }, { name: 'Tanuj Kumar', role: 'Social Media Co-Head', img: 'https://placehold.co/400x400/666666/FFFFFF?text=Ethan' }, { name: 'Saksham Sonker', role: 'Graphics Co-Head', img: 'https://placehold.co/400x400/808080/FFFFFF?text=Fiona' }
+  const teamMembers = [
+    { name: 'Aditya Srivastav', role: 'President', img: 'https://placehold.co/400x400/000000/FFFFFF?text=A' },
+    { name: 'Gauri', role: 'Vice President', img: 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=G' },
+    { name: 'Gagandeep Singh', role: 'Social Media Head', img: 'https://placehold.co/400x400/333333/FFFFFF?text=GS' },
+    { name: 'Prateek Agarwal', role: 'Operations Head', img: 'https://placehold.co/400x400/4d4d4d/FFFFFF?text=P' },
+    { name: 'Ishan Mishra', role: 'Graphics Head', img: 'https://placehold.co/400x400/666666/FFFFFF?text=I' },
+    { name: 'Sarvagya Joshi', role: 'Tech Head', img: 'https://placehold.co/400x400/808080/FFFFFF?text=S' },
+    { name: 'Hitesh Tyagi', role: 'PR Head', img: 'https://placehold.co/400x400/000000/FFFFFF?text=H' },
+    { name: 'Yaniya', role: 'Frontend Lead', img: 'https://placehold.co/400x400/1a1a1a/FFFFFF?text=Y' },
+    { name: 'Manan Wadhwa', role: 'AI/ML Head', img: 'https://placehold.co/400x400/333333/FFFFFF?text=M' },
+    { name: 'Pratham Gupta', role: 'Backend Lead', img: 'https://placehold.co/400x400/4d4d4d/FFFFFF?text=PG' },
+    { name: 'Tanuj Kumar', role: 'Social Media Co-Head', img: 'https://placehold.co/400x400/666666/FFFFFF?text=T' },
+    { name: 'Saksham Sonker', role: 'Graphics Co-Head', img: 'https://placehold.co/400x400/808080/FFFFFF?text=SS' }
   ];
   return (
     <div className="w-full min-h-screen text-white p-8 pt-24">
-      <div className="max-w-6xl mx-auto"><h1 className="text-5xl font-bold text-center mb-12 text-cyan-400">Meet The Team</h1><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">{teamMembers.map((member, index) => (<div key={index} className="glass-card p-6 text-center transform hover:scale-105 transition-transform duration-300"><img src={member.img} alt={member.name} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-cyan-500" /><h3 className="text-2xl font-semibold">{member.name}</h3><p className="text-cyan-400">{member.role}</p></div>))}</div></div>
+      <div className="max-w-6xl mx-auto"><h1 className="text-5xl font-bold text-center mb-12 text-cyan-400">Meet The Team</h1><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">{teamMembers.map((member, index) => (<div key={index} className="glass-card p-6 text-center transform hover:scale-105 transition-transform duration-300">
+        {/* FIX 3: Replaced <img> with next/image's <Image> component for optimization */}
+        <Image src={member.img} alt={member.name} width={128} height={128} className="rounded-full mx-auto mb-4 border-4 border-cyan-500" />
+        <h3 className="text-2xl font-semibold">{member.name}</h3>
+        <p className="text-cyan-400">{member.role}</p>
+        </div>))}</div></div>
     </div>
   );
 };
@@ -198,12 +246,16 @@ const ProjectsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const categories = ['All', 'AI', 'Web', 'Mobile'];
   const filteredProjects = useMemo(() => { if (selectedCategory === 'All') return projectsData; return projectsData.filter((project) => project.category === selectedCategory); }, [selectedCategory]);
-  const getStatusColor = (status) => { switch (status) { case 'Completed': return 'text-green-400 bg-green-400/10'; case 'In Development': return 'text-blue-400 bg-blue-400/10'; case 'Planning': return 'text-purple-400 bg-purple-400/10'; default: return 'text-gray-400 bg-gray-400/10'; } };
+  const getStatusColor = (status: string) => { switch (status) { case 'Completed': return 'text-green-400 bg-green-400/10'; case 'In Development': return 'text-blue-400 bg-blue-400/10'; case 'Planning': return 'text-purple-400 bg-purple-400/10'; default: return 'text-gray-400 bg-gray-400/10'; } };
 
-  const ProjectCard = ({ project }) => (
+  // Typed the 'project' prop for the card component
+  const ProjectCard = ({ project }: { project: typeof projectsData[0] }) => (
     <div className="glass-card p-6 group h-full flex flex-col hover:border-cyan-400 transition-all duration-300">
       <div className="relative overflow-hidden rounded-lg mb-4 aspect-video flex items-center justify-center bg-black/30">
-        {project.image ? <img src={project.image} alt={project.title} className="object-cover w-full h-full rounded-lg transition-transform duration-300 group-hover:scale-110" /> : <div className="text-5xl text-white/20">{project.category === 'AI' ? <Brain /> : project.category === 'Web' ? <Globe /> : project.category === 'Mobile' ? <Smartphone /> : <Code />}</div>}
+        {project.image ? 
+          // FIX 3 (cont.): Replaced <img> with <Image> using the 'fill' prop.
+          <Image src={project.image} alt={project.title} fill className="object-cover rounded-lg transition-transform duration-300 group-hover:scale-110" /> 
+          : <div className="text-5xl text-white/20">{project.category === 'AI' ? <Brain /> : project.category === 'Web' ? <Globe /> : project.category === 'Mobile' ? <Smartphone /> : <Code />}</div>}
         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-3">
           <Button size="sm" onClick={() => window.open(project.liveUrl, '_blank')} disabled={!project.liveUrl || project.liveUrl === '#'}><ExternalLink className="h-3 w-3 mr-1" /> Live</Button>
           <Button size="sm" variant="outline" onClick={() => window.open(project.githubUrl, '_blank')} disabled={!project.githubUrl || project.githubUrl === '#'}><Github className="h-3 w-3 mr-1" /> Code</Button>
@@ -263,11 +315,10 @@ const ContactPage = () => {
     { name: 'Email', icon: <Mail />, url: 'mailto:contact@techxtract.com' },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission logic here
     alert('Thank you for your message! We will get back to you soon.');
-    e.target.reset();
+    e.currentTarget.reset();
   };
 
   return (
@@ -277,21 +328,11 @@ const ContactPage = () => {
           <h1 className="text-5xl font-bold text-cyan-400 mb-4">Get In Touch</h1>
           <p className="text-lg text-gray-300">Have a question or want to collaborate? Reach out to us!</p>
         </div>
-
         <div className="flex justify-center gap-6 mb-16">
           {socialLinks.map(link => (
-            <a
-              key={link.name}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-16 h-16 glass-card rounded-full flex items-center justify-center text-cyan-400 hover:text-white hover:bg-cyan-500/50 transition-all duration-300 transform hover:scale-110 glow"
-            >
-              {link.icon}
-            </a>
+            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="w-16 h-16 glass-card rounded-full flex items-center justify-center text-cyan-400 hover:text-white hover:bg-cyan-500/50 transition-all duration-300 transform hover:scale-110 glow" >{link.icon}</a>
           ))}
         </div>
-
         <div className="glass-card p-8 md:p-12">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -306,12 +347,10 @@ const ContactPage = () => {
             </div>
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
-              <textarea id="message" name="message" rows="5" required className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+              <textarea id="message" name="message" rows={5} required className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
             </div>
             <div className="text-center">
-              <Button type="submit" size="lg" className="glow">
-                Send Message
-              </Button>
+              <Button type="submit" size="lg" className="glow">Send Message</Button>
             </div>
           </form>
         </div>
@@ -328,7 +367,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('home');
   useEffect(() => { const timer = setTimeout(() => { setIsLoading(false); }, 4000); return () => clearTimeout(timer); }, []);
-  const handleNavigate = (page) => { setCurrentPage(page); window.scrollTo(0, 0); };
+  const handleNavigate = (page: string) => { setCurrentPage(page); window.scrollTo(0, 0); };
   if (isLoading) { return <Loader />; }
 
   const renderPage = () => {
@@ -355,4 +394,3 @@ const App = () => {
 };
 
 export default App;
-
