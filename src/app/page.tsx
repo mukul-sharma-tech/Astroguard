@@ -235,7 +235,7 @@ const EventsPage = () => {
   return (
     <div className="w-full min-h-screen text-white p-8 pt-24">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold text-center mb-4 text-cyan-400">Our Events</h1><p className="text-lg text-gray-300 text-center mb-12">Workshops, hackathons, and seminars we've hosted.</p>
+        <h1 className="text-5xl font-bold text-center mb-4 text-cyan-400">Our Events</h1><p className="text-lg text-gray-300 text-center mb-12">Workshops, hackathons, and seminars we have hosted.</p>
         <div className="flex justify-center space-x-4 mb-12">{years.map(year => (<button key={year} onClick={() => setSelectedYear(year)} className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 ${selectedYear === year ? 'bg-cyan-500 text-black' : 'bg-gray-700/50 hover:bg-gray-600/50'}`}>{year}</button>))}</div>
         <div className="space-y-8">{filteredEvents.length > 0 ? filteredEvents.map(event => (<div key={event.id} className="glass-card p-6 md:flex items-center gap-6"><div className="md:w-1/4 text-center md:text-left mb-4 md:mb-0"><p className="text-2xl font-bold text-cyan-400">{event.date}</p><p className="text-gray-400">{event.year}</p></div><div className="md:w-3/4"><h2 className="text-2xl font-bold text-white mb-2">{event.title}</h2><p className="text-gray-300 mb-3">{event.description}</p><span className="px-3 py-1 text-sm rounded-full bg-cyan-400/10 text-cyan-300">{event.type}</span></div></div>)) : (<div className="text-center py-16"><p className="text-2xl text-gray-400">No events found for {selectedYear}.</p></div>)}</div>
       </div>
@@ -246,7 +246,7 @@ const EventsPage = () => {
 const JourneyPage = () => (
   <section id="journey" className="w-full min-h-screen text-white p-8 pt-24">
     <div className="max-w-5xl mx-auto">
-      <div className="text-center mb-16"><h1 className="text-5xl font-bold text-cyan-400 mb-4">Our Journey</h1><p className="text-lg text-gray-300">A timeline of our society's key milestones and achievements.</p></div>
+      <div className="text-center mb-16"><h1 className="text-5xl font-bold text-cyan-400 mb-4">Our Journey</h1><p className="text-lg text-gray-300">A timeline of our society key milestones and achievements.</p></div>
       <div className="relative">
         <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-cyan-500 via-purple-500 to-blue-500" />
         <div className="space-y-12">{journeyData.map((item, index) => (<div key={index} className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}><div className="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-cyan-400 border-4 border-gray-900 transform -translate-x-1/2 z-10" /><div className={`w-full md:w-5/12 ml-10 md:ml-0 ${index % 2 === 0 ? 'md:pr-10' : 'md:pl-10'}`}><div className="glass-card p-6"><div className="flex items-start justify-between mb-3"><div><h3 className="text-xl font-bold text-white mb-1">{item.title}</h3><p className="text-base font-semibold text-cyan-300 mb-2">{item.subtitle}</p></div><span className="px-2 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400 whitespace-nowrap">{item.type}</span></div><div className="flex items-center space-x-4 text-sm text-gray-400 mb-3"><span className="flex items-center"><Calendar className="mr-1.5 h-4 w-4" />{item.period}</span></div><p className="text-gray-300 text-sm">{item.description}</p></div></div></div>))}</div>
