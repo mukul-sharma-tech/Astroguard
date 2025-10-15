@@ -310,7 +310,7 @@ const JourneyPage = () => (
 const ContactPage = () => {
   const socialLinks = [
     { name: 'Instagram', icon: <Instagram />, url: 'https://www.instagram.com/techxtract_official/' },
-    { name: 'LinkedIn', icon: <Linkedin />, url: '#' },
+    { name: 'LinkedIn', icon: <Linkedin />, url: 'https://www.linkedin.com/company/techxtractcst/' },
     { name: 'GitHub', icon: <Github />, url: '#' },
     { name: 'Email', icon: <Mail />, url: 'mailto:contact@techxtract.com' },
   ];
